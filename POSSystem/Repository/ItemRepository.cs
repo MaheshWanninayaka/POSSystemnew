@@ -19,7 +19,7 @@ namespace POSSystem.Repository
             {
                 try
                 {
-                    
+
                     conn.ConnectionString = "Server=DESKTOP-1UD7PJE\\SQLEXPRESS;Database=POSdb;Integrated Security=true;TrustServerCertificate=True";
 
                     conn.Open();
@@ -32,14 +32,14 @@ namespace POSSystem.Repository
                             {
                                 List<Item> items = new List<Item>();
 
-                                while (reader.Read())
+                                while (await reader.ReadAsync())
                                 {
                                     Item item = new Item
                                     {
-                                        ItemId = (int)reader["ItemId"], 
+                                        ItemId = (int)reader["ItemId"],
                                         ItemName = (string)reader["ItemName"],
-                                        Price= (decimal?)reader["Price"],
-                                        Quantity= (decimal?)reader["Quantity"]
+                                        Price = (decimal?)reader["Price"],
+                                        Quantity = (decimal?)reader["Quantity"]
                                     };
 
                                     items.Add(item);

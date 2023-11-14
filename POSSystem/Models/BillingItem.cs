@@ -2,7 +2,7 @@
 {
     public class BillingItem
     {
-        public int BillingItemId { get;set; }
+        public int? BillingItemId { get;set; }
         public int ItemId { get;set; }
         public int? BillingInformationId { get;set; }
         public decimal Quantity { get;set; }    

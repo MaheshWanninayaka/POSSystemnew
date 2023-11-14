@@ -28,11 +28,10 @@ namespace POSSystem.Repository
                 {
                     if (billingInformation != null)
                     {
-                        using (SqlCommand cmd = new SqlCommand("INSERT INTO dbo.BillingInformation (Discount, GrandTotal, ItemId, SubTotal, Vat) VALUES (@Discount, @GrandTotal, @ItemId, @SubTotal, @Vat); SELECT SCOPE_IDENTITY();", conn, tran))
+                        using (SqlCommand cmd = new SqlCommand("INSERT INTO dbo.BillingInformation (Discount, GrandTotal, SubTotal, Vat) VALUES (@Discount, @GrandTotal, @SubTotal, @Vat); SELECT SCOPE_IDENTITY();", conn, tran))
                         {
                             cmd.Parameters.AddWithValue("@Discount", billingInformation.Discount);
                             cmd.Parameters.AddWithValue("@GrandTotal", billingInformation.GrandTotal);
-                            cmd.Parameters.AddWithValue("@ItemId", billingInformation.ItemId);
                             cmd.Parameters.AddWithValue("@SubTotal", billingInformation.SubTotal);
                             cmd.Parameters.AddWithValue("@Vat", billingInformation.Vat);
 
@@ -48,7 +47,7 @@ namespace POSSystem.Repository
                                     itemCmd.Parameters.AddWithValue("@Price", item.Price);
                                     itemCmd.Parameters.AddWithValue("@Amount", item.Amount);
 
-                                    itemCmd.ExecuteNonQuery();
+                                    await itemCmd.ExecuteNonQueryAsync();
                                 }
                             }
 

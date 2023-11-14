@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export default function BillingInformation() {
 
-    const date1 = new Date().toISOString().split('T')[0]; 
+    const date1 = new Date().toISOString().split('T')[0];
     const initialTime = formatTime(new Date());
 
     const [date, setDate] = useState(date1);
@@ -32,6 +32,7 @@ export default function BillingInformation() {
     useEffect(() => {
         var items = getAllItems();
         setDate(date1);
+        setVat(12);
     }, []);
 
     useEffect(() => {
@@ -43,6 +44,11 @@ export default function BillingInformation() {
         handleAmount();
 
     }, [quantity]);
+
+    useEffect(() => {
+        handleGrandTotal();
+
+    }, [dataModel,discount ]);
 
     useEffect(() => {
         const selectedItem = items.find(x => x.itemId === parseInt(item));
@@ -66,8 +72,8 @@ export default function BillingInformation() {
 
     const handleClick = () => {
         const newItem = {
-            itemId: items,
-            quantity: quantity,
+            itemId: parseInt(item),
+            quantity: parseFloat( quantity),
             price: price,
             amount: parseFloat(quantity) * price,
         };
@@ -92,13 +98,24 @@ export default function BillingInformation() {
         setAmount(parseFloat(quantity) * price);
     }
 
+    function handleGrandTotal() {
 
-    function PaidBillAmounts() {
+        var total = parseFloat(subTotal + parseFloat((subTotal * vat) / 100) - parseFloat((subTotal * discount) / 100)).toFixed(2);
+        setGrandTotal(total);
+    }
+
+    function handleReset() {
+        setItem(0);
+        setQuantity(0);
+        setPrice(0);
+        setAmount(0);
+    }
 
 
+     function PaidBillAmounts() {
+        
         var paidmodel = {
             billInginformationId: 0,
-            itemId: parseInt(item),
             subTotal: subTotal,
             discount: parseFloat(discount),
             vat: parseFloat(vat),
@@ -107,7 +124,7 @@ export default function BillingInformation() {
         };
 
         console.log("paidmodel", paidmodel)
-        var result = axios.post(`http://localhost:44416/api/BillingInformation/SaveBillingInformation`, paidmodel);
+        var result = postData(paidmodel)
 
         if (result.data == true) {
             alert("success");
@@ -117,7 +134,10 @@ export default function BillingInformation() {
             alert("failed");
         }
 
+    }
 
+    async function postData(paidmodel) {
+        return await axios.post(`http://localhost:44416/api/BillingInformation/SaveBillingInformation`, paidmodel);
     }
 
     function cleardata() {
@@ -169,7 +189,7 @@ export default function BillingInformation() {
                 <input type="text" name={amount} value={amount} readOnly /><br />
 
                 <button onClick={() => handleClick()}>Add to bill</button>
-                <button>Reset</button>
+                <button onClick={() => handleReset()}>Reset</button>
 
             </div>
 
@@ -191,7 +211,7 @@ export default function BillingInformation() {
                                     console.log("item", item)
                                     return (
                                         <tr>
-                                            <th>{item.items}</th>&nbsp;
+                                            <th>{item.itemName}</th>&nbsp;
                                             <th>{item.quantity}</th>&nbsp;
                                             <th>{item.price}</th>&nbsp;
                                             <th>{item.amount}</th>
@@ -214,10 +234,10 @@ export default function BillingInformation() {
             <input type="text" name={discount} value={discount} onChange={(e) => setDiscount(e.target.value)} />
 
             <label>VAT</label>
-            <input type="text" name={vat} value={vat} onChange={(e) => setVat(e.target.value)} />
+            <input type="text" name={vat} value={vat} readOnly />
 
             <label>Grand Total</label>
-            <input type="text" name={grandTotal} value={grandTotal} onChange={(e) => setGrandTotal(e.target.value)} />
+            <input type="text" name={grandTotal} value={grandTotal} readOnly />
             <div>
 
             </div>
