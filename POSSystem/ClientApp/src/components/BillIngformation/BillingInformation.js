@@ -9,14 +9,8 @@ export default function BillingInformation() {
     const [date, setDate] = useState(date1);
     const [time, setTime] = useState(initialTime);
 
-
-
     const [items, setItems] = useState([]);
     const [item, setItem] = useState(0);
-
-    console.log("items", items)
-
-    console.log("item", item)
 
     const [quantity, setQuantity] = useState(0);
     const [price, setPrice] = useState(0);
@@ -48,11 +42,10 @@ export default function BillingInformation() {
     useEffect(() => {
         handleGrandTotal();
 
-    }, [dataModel,discount ]);
+    }, [dataModel, discount]);
 
     useEffect(() => {
         const selectedItem = items.find(x => x.itemId === parseInt(item));
-        console.log("selectedItem", selectedItem)
         const selectedPrice = selectedItem ? selectedItem.price : 0;
 
         setPrice(selectedPrice);
@@ -73,7 +66,7 @@ export default function BillingInformation() {
     const handleClick = () => {
         const newItem = {
             itemId: parseInt(item),
-            quantity: parseFloat( quantity),
+            quantity: parseFloat(quantity),
             price: price,
             amount: parseFloat(quantity) * price,
         };
@@ -89,7 +82,6 @@ export default function BillingInformation() {
         }
 
         var total = dataModel.reduce((acc, item) => acc + parseFloat(item.quantity) * parseFloat(item.price), 0);
-        console.log("total", total)
         setSubTotal(total);
     }
 
@@ -111,9 +103,7 @@ export default function BillingInformation() {
         setAmount(0);
     }
 
-
-     function PaidBillAmounts() {
-        
+    async function PaidBillAmounts() {
         var paidmodel = {
             billInginformationId: 0,
             subTotal: subTotal,
@@ -123,21 +113,28 @@ export default function BillingInformation() {
             items: dataModel,
         };
 
-        console.log("paidmodel", paidmodel)
-        var result = postData(paidmodel)
+        try {
+            var result = await postData(paidmodel);
+            console.log("result", result);
 
-        if (result.data == true) {
-            alert("success");
-            cleardata();
+            if (result.data === true) {
+                alert("success");
+                cleardata();
+            } else {
+                alert("failed");
+            }
+        } catch (error) {
+            console.error("Error during POST request:", error);
+            alert("An error occurred while processing the request.");
         }
-        else {
-            alert("failed");
-        }
-
     }
 
     async function postData(paidmodel) {
-        return await axios.post(`http://localhost:44416/api/BillingInformation/SaveBillingInformation`, paidmodel);
+        try {
+            return await axios.post(`http://localhost:44416/api/BillingInformation/SaveBillingInformation`, paidmodel);
+        } catch (error) {
+            throw error;
+        }
     }
 
     function cleardata() {
@@ -197,33 +194,25 @@ export default function BillingInformation() {
                 <table>
                     <thead>
                         <tr>
-                            <th>Item</th>&nbsp;
-                            <th>Quantity</th>&nbsp;
-                            <th>Price/Units</th>&nbsp;
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price/Units</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {
-                            dataModel.length > 0 ?
-                                dataModel.map((item, index) => {
-                                    console.log("item", item)
-                                    return (
-                                        <tr>
-                                            <th>{item.itemName}</th>&nbsp;
-                                            <th>{item.quantity}</th>&nbsp;
-                                            <th>{item.price}</th>&nbsp;
-                                            <th>{item.amount}</th>
-
-                                        </tr>
-
-                                    )
-
-                                }) : null
-                        }
+                        {dataModel.length > 0 ? (
+                            dataModel.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.itemName}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>{item.price}</td>
+                                    <td>{item.amount}</td>
+                                </tr>
+                            ))
+                        ) : null}
                     </tbody>
-
                 </table>
 
             </div>
